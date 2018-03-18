@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { graphql, compose } from 'react-apollo'
+import { graphql, compose, withApollo } from 'react-apollo'
 import gql from 'graphql-tag'
 
 import createFrontSchema from '@project-r/styleguide/lib/templates/Front'
@@ -9,6 +9,9 @@ import Loader from '../Loader'
 import Frame from '../Frame'
 import Link from '../Link/Href'
 import SSRCachingBoundary, { webpCacheKey } from '../SSRCachingBoundary'
+
+import { getDocument as preFetchQuery } from '../Article/Page'
+import { prefetch } from '../../lib/prefetch'
 
 import { renderMdast } from 'mdast-react-render'
 
@@ -40,6 +43,20 @@ const getDocument = gql`
 `
 
 class Front extends Component {
+  componentDidMount () {
+    const { data: { front }, client } = this.props
+    const content = front && {
+      ...front.content
+    }
+    if (content) {
+      const page = 'article'
+      const articlesToPrefetch = content.children.slice(0, 5)
+      const variablesForEachQuery = articlesToPrefetch.map(({ data: { url } }) => {
+        return { path: url }
+      })
+      prefetch(client, preFetchQuery, variablesForEachQuery, page)
+    }
+  }
   render () {
     const { url, data, data: { front }, t } = this.props
     const meta = front && {
@@ -72,7 +89,7 @@ export default compose(
         path: '/'
       }
     }),
-    props: ({data, ownProps: {serverContext}}) => {
+    props: ({ data, ownProps: { serverContext } }) => {
       if (serverContext && !data.error && !data.loading && !data.front) {
         serverContext.res.statusCode = 503
       }
@@ -82,4 +99,4 @@ export default compose(
       }
     }
   })
-)(Front)
+)(withApollo(Front))

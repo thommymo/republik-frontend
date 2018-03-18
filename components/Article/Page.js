@@ -80,7 +80,7 @@ const ActionBar = ({ title, discussionId, discussionPage, discussionPath, dossie
   </div>
 )
 
-const getDocument = gql`
+export const getDocument = gql`
   query getDocument($path: String!) {
     article: document(path: $path) {
       id
@@ -184,7 +184,7 @@ class ArticlePage extends Component {
           y > (mobile ? HEADER_HEIGHT_MOBILE : HEADER_HEIGHT)) ||
           (!this.state.isSeries &&
             y + (mobile ? HEADER_HEIGHT_MOBILE : HEADER_HEIGHT) >
-              this.y + this.barHeight))
+            this.y + this.barHeight))
       ) {
         if (!this.state.showSecondary) {
           this.setState({ showSecondary: true })
@@ -296,7 +296,7 @@ class ArticlePage extends Component {
   }
 
   render () {
-    const { url, t, data, data: {article} } = this.props
+    const { url, t, data, data: { article } } = this.props
 
     const { meta, actionBar, schema, showAudioPlayer } = this.state
 
@@ -382,7 +382,7 @@ class ArticlePage extends Component {
 export default compose(
   withT,
   graphql(getDocument, {
-    options: ({url: {asPath}}) => ({
+    options: ({ url: { asPath } }) => ({
       variables: {
         path: asPath.split('?')[0]
       }
