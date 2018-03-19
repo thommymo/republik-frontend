@@ -50,7 +50,8 @@ class Front extends Component {
     }
     if (content) {
       const page = 'article'
-      const articlesToPrefetch = content.children.slice(0, 5)
+      const numberOfArticlesToPrefetch = 5
+      const articlesToPrefetch = content.children.slice(0, numberOfArticlesToPrefetch)
       const variablesForEachQuery = articlesToPrefetch.map(({ data: { url } }) => {
         return { path: url }
       })
